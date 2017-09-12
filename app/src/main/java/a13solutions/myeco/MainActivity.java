@@ -18,18 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import a13solutions.myeco.adapter.SlidingMenuAdapter;
-import a13solutions.myeco.fragment.FragmentHome;
-import a13solutions.myeco.fragment.FragmentLogin;
-import a13solutions.myeco.fragment.FragmentRegister;
-import a13solutions.myeco.fragment.FragmentTest;
 import a13solutions.myeco.model.ItemSlideMenu;
 
-/**The sceleton code for an app that shows all it's UI components in MainActivity's frame by chosing
- * an item to show from the sliding-menu implemented in this project. This project is expandable by
- * creating new Fragments and adding code to methods: addItemsToSlidingList() and
- * replaceFragment(int i).
+/**The skeleton code for an app that shows all it's UI components in MainActivity's frame by
+ * chosing an item to show from the sliding-menu implemented in this project.
  *
- * Created by: 13120dde
+ * This project follows MVC-pattern and all the logic should be implemented in the Controller
+ * class.
+ *
+ * Created by: 13120dde on 2017-09-12
  *
  */
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle actionBarDrawerToggle;
 
     //Declaration of other variables
+    private Controller controller;
 
 
     @Override
@@ -52,8 +50,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
 
         //Init components
+        controller = new Controller(this);
         instantiateComponents();
-        addItemsToSlidingList();
+
+        //populate the menu with a list containing ItemSlideMenu-objects.
+        listSliding = controller.addItemsToSlidingList(listSliding);
         setupListView();
         instantiateActionBar();
 
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.closeDrawer(listViewSliding);
 
         //Display fragment 1 when start
-        replaceFragment(0,true);
+        controller.replaceFragment(0,true);
 
         //Handle on item click
         listViewSliding.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 listViewSliding.setItemChecked(i,true);
 
                 //Replace fragment
-                replaceFragment(i, true);
+                controller.replaceFragment(i, true);
                 //Close menu
                 drawerLayout.closeDrawer(listViewSliding);
 
@@ -148,43 +149,20 @@ public class MainActivity extends AppCompatActivity {
      * add a new case in replaceFragment() method.
      *
      */
-    private void addItemsToSlidingList() {
+    /*private void addItemsToSlidingList() {
         listSliding.add(new ItemSlideMenu(R.drawable.ic_account_balance_black_48dp, "Home"));
         listSliding.add(new ItemSlideMenu(R.drawable.ic_assessment_black_48dp, "Register"));
         listSliding.add(new ItemSlideMenu(R.drawable.ic_settings_black_48dp, "Login"));
         listSliding.add(new ItemSlideMenu(R.drawable.ic_settings_black_48dp, "Test"));
-    }
+    }*/
 
-
-
-    /**Select a fragment to be shown in the main frame of the Activity by passing in an integer as
-     * argument. Every menu-item created with addItemsToSlidingList()-method gets an 'position'
-     * value that is used to chose which fragment to show in MainActivity window.
-     * @param position : int
+    /**The fragment passed in as argument in placed in the MainActivity's content_main frame.
+     * The boolean value indicates if the previous Fragment should be in backstack.
+     *
+     * @param fragment : Fragment
+     * @param backstack : boolean
      */
-    public void replaceFragment(int position, boolean backstack){
-
-        Fragment fragment = null;
-
-        //Add new Fragments to show here.
-        switch (position){
-            case 0:
-                fragment = new FragmentHome();
-                break;
-            case 1:
-                fragment = new FragmentRegister();
-                break;
-            case 2:
-                fragment = new FragmentLogin();
-                break;
-            case 3:
-                fragment = new FragmentTest();
-                break;
-            default:
-                fragment = new FragmentHome();
-                break;
-        }
-
+    public void replaceFragment(Fragment fragment, boolean backstack){
         if(fragment!=null){
             FragmentManager fm = getFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
